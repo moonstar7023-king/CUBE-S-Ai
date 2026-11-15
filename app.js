@@ -1,7 +1,7 @@
 const $=i=>document.getElementById(i);let user;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 auth.onAuthStateChanged(u=>{if(!u||!(u.emailVerified||u.phoneNumber))return location.href='index.html';user=u;$('who').textContent=u.email||u.phoneNumber;init();load()});
-$('out').onclick=()=>auth.signOut();
+$('out').onclick=async()=>{if(confirm('Logout se pehle: is phone se aap ki local tasveerein aur settings bhi hata dein?\n\nOK = hata do (shared phone par yahi chunein)\nCancel = rehne do'))await wipeLocal();auth.signOut()};
 function go(v){document.querySelectorAll('nav button,.view').forEach(x=>x.classList.remove('on'));document.querySelector('nav [data-v='+v+']').classList.add('on');$(v).classList.add('on');document.body.dataset.v=v}
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>go(b.dataset.v));
 const SYS={role:'system',content:'You are CUTE-S-AI, a free, friendly AI assistant made for students and open to everyone. Studies come first: explain step by step, make notes, quizzes and summaries, solve problems, and help with exams, assignments and coding. You can also help with everything else a good AI assistant does: poems, stories, translation, emails, advice, ideas and everyday questions. Make every task easy: give clear, simple, well-organised answers and offer a helpful next step. Reply in the language the user uses (Urdu, Roman Urdu or English). Be warm and kind. Never help with anything harmful, illegal, dangerous, hateful or sexual, or anything that could hurt someone; decline politely and suggest a safe alternative. Greet back in the same style: Assalam-o-Alaikum gets Walaikum Assalam, Namashty or Namaste gets Namashty, Hello gets Hello. Never say just Salam.'};
@@ -73,6 +73,7 @@ function acts(b,text){const a=document.createElement('div');a.className='act';
 
 /* ---------- AI helpers (Puter.js) ---------- */
 async function puterReady(){
+ if(!consent())return false;
  if(typeof puter==='undefined'){alert('The AI could not load. Check your internet or VPN, then refresh the page.');return false}
  try{if(!puter.auth.isSignedIn())await puter.auth.signIn()}catch(e){alert('Please sign in to Puter to use the AI. Allow popups and try again.');return false}
  return true}
@@ -271,14 +272,14 @@ async function loadLib(){const L=$('lbl');L.textContent='Please wait...';
 document.querySelector('nav [data-v=me]').addEventListener('click',loadLib);
 
 /* ---------- profile (memory) ---------- */
-function fillProfile(){$('pcl').value=profile.cls||'';$('psb').value=profile.subj||'';$('pgl').value=profile.goal||'';$('pvl').value=profile.vlang||'en'}
-$('psv').onclick=async()=>{profile={cls:$('pcl').value.trim().slice(0,100),subj:$('psb').value.trim().slice(0,150),goal:$('pgl').value.trim().slice(0,150),vlang:$('pvl').value};
+function fillProfile(){$('pnk').value=profile.nick||'';$('pcl').value=profile.cls||'';$('psb').value=profile.subj||'';$('pgl').value=profile.goal||'';$('pvl').value=profile.vlang||'en'}
+$('psv').onclick=async()=>{profile={...profile,nick:$('pnk').value.replace(/[@<>]/g,'').trim().slice(0,30),cls:$('pcl').value.trim().slice(0,100),subj:$('psb').value.trim().slice(0,150),goal:$('pgl').value.trim().slice(0,150),vlang:$('pvl').value};
  try{await UD().set(profile,{merge:true});toast('Profile saved 💗')}catch(e){toast('Could not save. Try again.')}};
 
 /* ---------- start ---------- */
 async function init(){if(inited)return;inited=true;welcome();
  try{const p=await UD().get();profile=p.exists?p.data():{}}catch(e){profile={}}
- fillProfile();try{deep=localStorage.getItem('cs_deep')==='1'}catch(e){}chipDeep();
+ fillProfile();purgeOld();try{deep=localStorage.getItem('cs_deep')==='1'}catch(e){}chipDeep();
  await loadProjects();chip();
  try{const old=JSON.parse(localStorage.getItem('cs_'+user.uid)||'[]');
   if(old.length){hist=old.map(h=>({role:h.role,content:h.content,shown:''}));await saveChat();localStorage.removeItem('cs_'+user.uid);hist=[];cid=null}}catch(e){}}
@@ -290,7 +291,7 @@ function noteEl(d,x){const e=document.createElement('div');e.className='note';
  if(x.uid===user.uid){
   if((x.reportCount||0)>=HIDE_AT){const w=document.createElement('small');w.textContent=' ⚠️ Hidden from others after reports';e.append(w)}
   const del=document.createElement('button');del.textContent='Delete';del.style.cssText='float:right;padding:6px 10px';
-  del.onclick=async()=>{if(confirm('Delete this note?')){await db.collection('notes').doc(d.id).delete();load()}};e.append(del)
+  del.onclick=async()=>{if(confirm('Delete this note?')){try{if(x.fileUrl&&store)await store.refFromURL(x.fileUrl).delete()}catch(e){}await db.collection('notes').doc(d.id).delete();load()}};e.append(del)
  }else{
   const rp=document.createElement('button');rp.textContent='⚠️ Report';rp.style.cssText='margin-left:8px;padding:4px 8px;font-size:.8rem;background:none;border:1px solid #555;color:inherit;border-radius:8px';
   rp.onclick=async()=>{if(!confirm('Report this note for wrong or copyrighted content?'))return;rp.disabled=true;
@@ -331,7 +332,7 @@ $('pub').onclick=async()=>{const E=$('ue'),t=$('t').value.trim(),un=$('u').value
  if(f&&(f.size>10*1024*1024||!/^(application\/pdf|image\/)/.test(f.type)))return E.textContent='Only PDF or image files up to 10 MB.';
  $('pub').disabled=true;try{let fileUrl='',fileName='';
   if(f){const ref=store.ref(`notes/${user.uid}/${Date.now()}_${f.name.replace(/[^\w.-]/g,'_')}`);await ref.put(f);fileUrl=await ref.getDownloadURL();fileName=f.name}
-  await db.collection('notes').add({title:t,uni:un,subject:sb,text:tx,fileUrl,fileName,uid:user.uid,author:(user.email||'student').split('@')[0],createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  await db.collection('notes').add({title:t,uni:un,subject:sb,text:tx,fileUrl,fileName,uid:user.uid,author:(profile.nick||'Student').slice(0,30),createdAt:firebase.firestore.FieldValue.serverTimestamp()});
   E.textContent='✅ Published! Thank you for sharing 💗';['t','u','sb','tx','f'].forEach(i=>$(i).value='');load()}catch(e){E.textContent='Upload failed. Please try again.'}$('pub').disabled=false};
 
 
@@ -387,6 +388,7 @@ function settings(){const c=$('mc');c.innerHTML='<h3>⚙️ Settings</h3><div id
  mi(L,'🔤 Text size: '+({s:'Small',m:'Medium',l:'Large'})[SET.fs],()=>{SET.fs={s:'m',m:'l',l:'s'}[SET.fs];saveSet();applySet();settings()});
  mi(L,'🌐 Reply language: '+langName(SET.lang),langMenu);
  mi(L,'📏 Answer length: '+({short:'Short',norm:'Normal',long:'Detailed'})[SET.len||'norm'],()=>{SET.len={norm:'short',short:'long',long:'norm'}[SET.len||'norm'];saveSet();settings()});
+ mi(L,'🔒 Privacy & data',privacyMenu);
  mi(L,'🖼 Image Studio & settings',()=>imStudio());
  mi(L,'🧠 Deep mode: '+(deep?'on':'off'),()=>{$('dp').click();settings()});
  mi(L,'⬇️ Export this chat (.txt)',()=>{if(!hist.length)return toast('No chat yet');dl(new Blob([hist.map(h=>(h.role==='user'?'You: ':'CUTE-S-AI: ')+(h.shown||h.content)).join('\n\n')],{type:'text/plain'}),'cute-s-ai-chat.txt')});
@@ -455,3 +457,35 @@ function focus(){const c=$('mc');c.innerHTML='<h3>⏱ Focus timer</h3><div style
  mi(L,'↺ Reset',()=>{clearInterval(FT.id);FT.run=false;FT.mode='work';FT.left=1500;focus()});
  mi(L,'⏭ Skip to '+(FT.mode==='work'?'break':'study'),()=>{clearInterval(FT.id);FT.run=false;FT.mode=FT.mode==='work'?'break':'work';FT.left=FT.mode==='work'?1500:300;focus()});openModal()}
 $('tl').onclick=tools;$('ft').onclick=focus;streak();
+
+/* ---------- privacy & data controls ---------- */
+function consent(){try{if(localStorage.getItem('cs_consent_v1')==='1')return true}catch(e){}
+ const ok=confirm('🔒 Privacy notice\n\nAI ka jawab banane ke liye aap ka text (aur attach ki hui file ya tasveer ka matan) Puter aur uske AI providers ko bheja jata hai. Wo apni privacy shartein follow karte hain.\n\nAI ko apna password, ID card ya bank ki detail mat likhein.\n\nOK = samajh gaya, aage barhein\nCancel = ruk jao\n\nPoori policy: Me tab > Privacy Policy.');
+ if(ok){try{localStorage.setItem('cs_consent_v1','1')}catch(e){}}return ok}
+async function wipeLocal(){try{Object.keys(localStorage).filter(k=>k.startsWith('cs_')&&k!=='cs_consent_v1').forEach(k=>localStorage.removeItem(k))}catch(e){}
+ await new Promise(res=>{try{const r=indexedDB.deleteDatabase('cute-s-img');r.onsuccess=r.onerror=r.onblocked=()=>res();setTimeout(res,1200)}catch(e){res()}})}
+async function delAll(col){for(;;){const s=await UD().collection(col).limit(100).get();if(s.empty)break;
+ for(const d of s.docs){if(col==='chats'){try{await d.ref.collection('msgs').doc('main').delete()}catch(e){}}await d.ref.delete()}}}
+async function purgeOld(){const k=+(profile.keep||0);if(!k)return;
+ try{const cut=firebase.firestore.Timestamp.fromMillis(Date.now()-k*864e5);const s=await UD().collection('chats').where('updatedAt','<',cut).limit(40).get();
+  for(const d of s.docs){if(d.id===cid)continue;try{await d.ref.collection('msgs').doc('main').delete()}catch(e){}await d.ref.delete()}
+  if(s.size)chats=chats.filter(c=>!s.docs.some(d=>d.id===c.id))}catch(e){}}
+function privacyMenu(){const c=$('mc');c.innerHTML='<h3>🔒 Privacy & data</h3><p class="qw">Aap ka data aap ke control mein hai. <a href="privacy.html" target="_blank" style="color:var(--rose)">Privacy Policy</a></p><div id="m_p"></div>';const L=$('m_p');
+ const K={'':'Off','7':'7 days','30':'30 days','90':'90 days'},nx={'':'7','7':'30','30':'90','90':''};
+ mi(L,'⏳ Auto-delete old chats: '+K[String(profile.keep||'')],async()=>{profile.keep=nx[String(profile.keep||'')];try{await UD().set({keep:profile.keep},{merge:true});await purgeOld()}catch(e){toast('Could not save.')}privacyMenu()});
+ mi(L,'🧹 Clear this phone (settings, gallery)',async()=>{if(confirm('Is phone se aap ki local settings aur tasveeron ki gallery hata dein? (Aap ka account aur chats nahi mitenge)')){await wipeLocal();toast('Local data cleared')}});
+ mi(L,'🗑 Delete all my chats',()=>{if(confirm('Saari chats delete karein? Ye wapas nahi aayengi.'))wipe('chats')});
+ mi(L,'🗑 Delete my saved library',()=>{if(confirm('Saved library delete karein?'))wipe('saved')});
+ mi(L,'⚠️ Delete my account & all data',deleteAccount,'danger')}
+async function deleteAccount(){
+ if(!confirm('⚠️ Aap ka account aur saara data (chats, projects, library, aap ke publish kiye notes aur unki files) hamesha ke liye delete ho jayega. Ye wapas nahi ho sakta.\n\nAage barhein?'))return;
+ if((prompt('Confirm karne ke liye DELETE likhein')||'').trim()!=='DELETE')return toast('Cancelled');
+ if(user.email){const pw=prompt('Security ke liye apna password likhein');if(!pw)return toast('Cancelled');
+  try{await user.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(user.email,pw))}catch(e){return toast('Password ghalat hai.')}}
+ toast('Delete ho raha hai, please wait...');
+ try{for(const col of ['chats','projects','saved'])await delAll(col);
+  const n=await db.collection('notes').where('uid','==',user.uid).get();
+  for(const d of n.docs){const x=d.data();try{if(x.fileUrl&&store)await store.refFromURL(x.fileUrl).delete()}catch(e){}await d.ref.delete()}
+  try{if(store){const l=await store.ref('notes/'+user.uid).listAll();for(const it of l.items)await it.delete()}}catch(e){}
+  await UD().delete();await user.delete();await wipeLocal();location.href='index.html'}
+ catch(e){toast(e&&e.code==='auth/requires-recent-login'?'Security ke liye logout karke dobara login karein, phir turant delete karein.':'Delete poora nahi hua. Dobara try karein.')}}
