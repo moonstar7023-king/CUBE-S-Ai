@@ -23,7 +23,7 @@ function mood(q,r){const t=q.toLowerCase();
  if(/udas|sad|tension|stress|dar lag|depress|rona/.test(t))return pet('hug',4500);
  if(/exam|test|paper|quiz|mcq|viva/.test(t))return pet('cheer',3500);
  pet('happy',3000)}
-let hist=[],busy=false,cid=null,cproj='',projects=[],chats=[],profile={},deep=false,attach=null,inited=false,fproj='';
+let hist=[],busy=false,cid=null,cproj='',projects=[],chats=[],profile={},deep='normal',attach=null,inited=false,fproj='';
 const M=$('msgs'),UD=()=>db.collection('users').doc(user.uid),TS=()=>firebase.firestore.FieldValue.serverTimestamp();
 const VL={en:'en-US',ur:'ur-PK',hi:'hi-IN',ar:'ar-SA',pa:'pa-IN',fa:'fa-IR',bn:'bn-BD',tr:'tr-TR',es:'es-ES',fr:'fr-FR',de:'de-DE',ru:'ru-RU',zh:'zh-CN',ja:'ja-JP',ko:'ko-KR',id:'id-ID'};
 function toast(t){const d=document.createElement('div');d.className='toast';d.textContent=t;document.body.append(d);setTimeout(()=>d.remove(),2200)}
@@ -81,7 +81,7 @@ function sysMsg(){let c=SYS.content;const p=profile;
  if(pf.length)c+='\nStudent profile: '+pf.join('; ')+'. Adapt difficulty and examples to it.';
  const pr=projects.find(x=>x.id===cproj);
  if(pr)c+='\nCurrent project: "'+pr.name+'". Student notes about it: '+(pr.ctx||'none')+'. Keep answers relevant to this project.';
- if(deep)c+='\nDeep mode is ON: reason step by step, double-check calculations and facts, then give a clear final answer.';
+ if(deep==='advance')c+='\nAdvance mode: think carefully, give a well-structured answer with clear explanations and one short example.';if(deep==='deep')c+='\nDeep mode is ON: reason step by step, double-check calculations and facts, then give a clear final answer.';
  if(SET.lang!=='auto')c+='\nAlways reply in '+LN[SET.lang]+', whatever language the student writes in.';else c+='\nYou understand every language in the world. Reply in the language the student writes in.';
  c+='\nWhen a chart helps, add a fenced block named chart with JSON like {"type":"bar","title":"T","labels":["A","B"],"values":[1,2]} (type bar, line or pie). For diagrams use a mermaid block. For a small web page or app give one complete html block. For spreadsheet data, calculate carefully and show your working.';
  return {role:'system',content:c+extra}}
@@ -143,7 +143,7 @@ $('hb').onclick=openDrawer;$('dx').onclick=closeDrawer;$('dbg').onclick=closeDra
 
 /* ---------- projects ---------- */
 async function loadProjects(){try{const s=await UD().collection('projects').orderBy('createdAt').get();projects=s.docs.map(d=>({id:d.id,...d.data()}))}catch(e){projects=[]}}
-function chip(){const p=projects.find(x=>x.id===cproj);$('pj').textContent='📁 '+(p?p.name:'No project')}
+function chip(){const p=projects.find(x=>x.id===cproj);$('pj').textContent=p?p.name:'New project'}
 function setProj(id){cproj=id;chip();if(hist.length)saveChat()}
 async function newProj(){const n=(prompt('Project name (for example: Software Engineering)')||'').trim().slice(0,40);if(!n)return;
  const ctx=(prompt('What should I know about it? (exam date, topics, teacher style). Optional.')||'').trim().slice(0,400);
@@ -160,8 +160,9 @@ $('pj').onclick=()=>{const c=$('mc');c.innerHTML='<h3>📁 Projects</h3><div id=
  add('＋ New project',newProj,'ac');if(cproj){add('✏️ Edit this project',editProj,'ac');add('🗑 Delete this project',delProj,'ac')}openModal()};
 
 /* ---------- deep mode ---------- */
-function chipDeep(){$('dp').textContent='🧠 Deep: '+(deep?'on':'off');$('dp').classList.toggle('on',deep)}
-$('dp').onclick=()=>{deep=!deep;try{localStorage.setItem('cs_deep',deep?'1':'0')}catch(e){}chipDeep();toast(deep?'Deep mode on: step-by-step answers':'Deep mode off')};
+function chipDeep(){document.querySelectorAll('#dseg button').forEach(b=>b.classList.toggle('on',b.dataset.d===deep))}
+function setDeep(v){deep=v;try{localStorage.setItem('cs_deep',v)}catch(e){}chipDeep();toast('Mode: '+({normal:'Normal',advance:'Advance',deep:'Deep (step by step)'}[v]))}
+document.querySelectorAll('#dseg button').forEach(b=>b.onclick=()=>setDeep(b.dataset.d));
 
 /* ---------- attach a file (PDF / image / text) ---------- */
 function showAttach(name,st){const A=$('ap');A.hidden=false;A.innerHTML='';
@@ -270,7 +271,7 @@ $('psv').onclick=async()=>{profile={cls:$('pcl').value.trim().slice(0,100),subj:
 /* ---------- start ---------- */
 async function init(){if(inited)return;inited=true;welcome();
  try{const p=await UD().get();profile=p.exists?p.data():{}}catch(e){profile={}}
- fillProfile();try{deep=localStorage.getItem('cs_deep')==='1'}catch(e){}chipDeep();
+ fillProfile();try{const v=localStorage.getItem('cs_deep');deep=['normal','advance','deep'].includes(v)?v:(v==='1'?'deep':'normal')}catch(e){}chipDeep();
  await loadProjects();chip();
  try{const old=JSON.parse(localStorage.getItem('cs_'+user.uid)||'[]');
   if(old.length){hist=old.map(h=>({role:h.role,content:h.content,shown:''}));await saveChat();localStorage.removeItem('cs_'+user.uid);hist=[];cid=null}}catch(e){}}
@@ -332,7 +333,7 @@ let extra='',SET={fs:'m',lang:'auto',web:false,clib:false,cnotes:false};
 try{Object.assign(SET,JSON.parse(localStorage.getItem('cs_set')||'{}'))}catch(e){}
 const saveSet=()=>{try{localStorage.setItem('cs_set',JSON.stringify(SET))}catch(e){}};
 const unesc=s=>s.replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');
-function applySet(){M.style.zoom={s:.9,m:1,l:1.15}[SET.fs];$('sr').textContent='🔍 Search: '+(SET.web?'on':'off');$('sr').classList.toggle('on',SET.web)}
+function applySet(){M.style.zoom={s:.9,m:1,l:1.15}[SET.fs];$('sr').textContent='Search';$('sr').classList.toggle('on',SET.web)}
 function chartSvg(s){const L=(s.labels||[]).map(String).slice(0,12),V=(s.values||[]).map(Number).slice(0,12);if(!L.length||L.length!==V.length||V.some(isNaN))return null;
  const W=320,H=200,P=28,mx=Math.max(...V,1),col=['#ff4d5e','#ff8a95','#c9102a','#ffb3bb','#9b0f22','#ff6f7d'];let g='';
  if(s.type==='pie'){const tot=V.reduce((a,b)=>a+b,0)||1;let a0=-Math.PI/2;
@@ -378,12 +379,12 @@ async function wipe(col){try{const s=await UD().collection(col).limit(200).get()
 function settings(){const c=$('mc');c.innerHTML='<h3>⚙️ Settings</h3><div id="m_s"></div>';const L=$('m_s');
  mi(L,'🔤 Text size: '+({s:'Small',m:'Medium',l:'Large'})[SET.fs],()=>{SET.fs={s:'m',m:'l',l:'s'}[SET.fs];saveSet();applySet();settings()});
  mi(L,'🌐 Reply language: '+langName(SET.lang),langMenu);
- mi(L,'🧠 Deep mode: '+(deep?'on':'off'),()=>{$('dp').click();settings()});
+ mi(L,'🧠 Mode: '+({normal:'Normal',advance:'Advance',deep:'Deep'}[deep]),()=>{setDeep(deep==='normal'?'advance':deep==='advance'?'deep':'normal');settings()});
  mi(L,'🗑 Delete all my chats',async()=>{if(confirm('Delete ALL chats? This cannot be undone.')){await wipe('chats');closeModal()}},'ac');
  mi(L,'🗑 Delete my saved library',async()=>{if(confirm('Delete everything in your library?')){await wipe('saved');closeModal()}},'ac');openModal()}
 $('sr').onclick=()=>{SET.web=!SET.web;saveSet();applySet();toast(SET.web?'Web search on (Wikipedia)':'Web search off')};
 $('rs').onclick=()=>{const t=$('q').value.trim()||(prompt('What should I research?')||'').trim();if(t){$('q').value='';research(t.slice(0,200))}};
-$('cn').onclick=connectors;$('st').onclick=settings;applySet();
+$('cn').onclick=connectors;$('rs').addEventListener('click',closeDrawer);$('st').onclick=settings;applySet();
 
 
 /* ---------- image generation, export (PDF/Word/Excel/PowerPoint), spreadsheets ---------- */
