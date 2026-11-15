@@ -264,9 +264,27 @@ async function loadLib(){const L=$('lbl');L.textContent='Please wait...';
 document.querySelector('nav [data-v=me]').addEventListener('click',loadLib);
 
 /* ---------- profile (memory) ---------- */
-function fillProfile(){$('pcl').value=profile.cls||'';$('psb').value=profile.subj||'';$('pgl').value=profile.goal||'';$('pvl').value=profile.vlang||'en'}
-$('psv').onclick=async()=>{profile={cls:$('pcl').value.trim().slice(0,100),subj:$('psb').value.trim().slice(0,150),goal:$('pgl').value.trim().slice(0,150),vlang:$('pvl').value};
+function fillProfile(){$('pcl').value=profile.cls||'';$('psb').value=profile.subj||'';$('pgl').value=profile.goal||'';$('pvl').value=profile.vlang||'en';showAvatar()}
+$('psv').onclick=async()=>{profile={cls:$('pcl').value.trim().slice(0,100),subj:$('psb').value.trim().slice(0,150),goal:$('pgl').value.trim().slice(0,150),vlang:$('pvl').value,photo:profile.photo||''};
  try{await UD().set(profile,{merge:true});toast('Profile saved 💗')}catch(e){toast('Could not save. Try again.')}};
+
+/* ---------- profile photo (saved small, inside the user's own profile) ---------- */
+function ini(){return String((user&&(user.email||user.phoneNumber))||'U').replace(/^\+/,'').charAt(0).toUpperCase()}
+function showAvatar(){const ph=profile.photo||'';
+ const me=document.querySelector('nav [data-v=me] img');if(me)me.src=ph||'ic-me.png';
+ [$('pav'),$('dav')].forEach(el=>{if(!el)return;el.style.backgroundImage=ph?'url("'+ph+'")':'';el.textContent=ph?'':ini()});
+ $('prm').hidden=!ph}
+$('pch').onclick=$('pav').onclick=()=>$('pfile').click();
+$('pfile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
+ if(!/^image\//.test(f.type))return toast('Please choose an image');
+ try{const url=URL.createObjectURL(f);
+  const img=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=url});
+  const s=Math.min(img.width,img.height),c=document.createElement('canvas');c.width=c.height=256;
+  c.getContext('2d').drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,256,256);URL.revokeObjectURL(url);
+  const d=c.toDataURL('image/jpeg',.82);profile.photo=d;showAvatar();
+  await UD().set({photo:d},{merge:true});toast('Photo saved 💗')}catch(err){toast('Could not save the photo. Try another one.')}};
+$('prm').onclick=async()=>{profile.photo='';showAvatar();try{await UD().set({photo:''},{merge:true})}catch(e){}toast('Photo removed')};
+$('dav').onclick=()=>{closeDrawer();document.querySelector('nav [data-v=me]').click()};
 
 /* ---------- start ---------- */
 async function init(){if(inited)return;inited=true;welcome();
