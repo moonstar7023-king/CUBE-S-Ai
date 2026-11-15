@@ -117,5 +117,3 @@ nav button img.ic{margin:0}
 .fcard{padding:12px;border:1px solid var(--hi);border-radius:16px;background:rgba(255,66,88,.08);min-width:240px}
 .fh{display:flex;gap:12px;align-items:center}.fi{font-size:30px;width:46px;height:46px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:rgba(0,0,0,.4);flex:none}
 .fm{min-width:0}.fm b{display:block;font-size:14px;word-break:break-all}.fm small{color:var(--mute);font-size:12px}
-
-.mi.danger{color:#ff8095;border-color:rgba(255,128,149,.4)}

@@ -180,7 +180,8 @@ async function imGen(q, o) {
   try { im = await puter.ai.txt2img(full, opt); }
   catch (e) {
     if (o.ref) throw new Error('This photo could not be edited. Try a different image or a simpler change.');
-    if (opt.model) im = await puter.ai.txt2img(full); else throw e; // fall back to the default model
+    if (opt.model) throw new Error('The model "' + opt.model + '" could not make this image (' + ((e && (e.message || (e.error && e.error.message))) || 'unknown error') + '). Nothing was switched automatically: choose Auto or another model and try again.');
+    throw e;
   }
   const raw = await (await fetch(im.src)).blob();
   const blob = await imFinish(raw, rt, o.wm);

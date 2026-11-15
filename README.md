@@ -20,3 +20,6 @@ Just type a command or ask in plain words ("make a ppt on AI", "draw a cat").
 - **App:** `/help`, `/new`, `/history`, `/settings`, `/deep`, `/search on`, `/lang ur`, `/focus`, `/save`
 
 Files: `cmd.js` (command router + UI), `office.js` (real .docx / .xlsx / .zip builders, no CDN needed; .pptx uses PptxGenJS from cdnjs).
+
+## C-Univers-AI
+New menu with AI Images, Files, Videos, Coding, Research and Data. See UPGRADE-STEPS.md for files, deploy steps, tests and honest limits.

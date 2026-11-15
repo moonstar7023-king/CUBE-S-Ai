@@ -7,6 +7,19 @@ service cloud.firestore{
   }
   function str(v,mn,mx){ return v is string && v.size()>=mn && v.size()<=mx; }
 
+  // C-Univers-AI: admins are listed by hand in the Firebase console (collection "admins", one document per admin UID).
+  // Admins can change the model list. They get NO extra access to anyone's private data.
+  function admin(){ return request.auth!=null && exists(/databases/$(d)/documents/admins/$(request.auth.uid)); }
+  match /admins/{aid}{
+   allow read: if request.auth!=null && request.auth.uid==aid;
+   allow write: if false;
+  }
+  match /config/{cdoc}{
+   allow read: if ok();
+   allow write: if ok() && admin() && cdoc=='models'
+    && request.resource.data.keys().hasOnly(['disabled','defaults','extra','updatedAt']);
+  }
+
   match /notes/{id}{
    allow read: if ok();
 
