@@ -1,4 +1,4 @@
-# CUTE-S AI 🐰
+# CUBE-S AI
 Free AI study buddy + shared notes library for students. Static web app (HTML/CSS/JS) using Firebase (login, notes) and Puter.js (free AI chat).
 
 ## Setup

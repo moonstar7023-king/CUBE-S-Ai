@@ -4,10 +4,10 @@ auth.onAuthStateChanged(u=>{if(!u||!(u.emailVerified||u.phoneNumber))return loca
 $('out').onclick=()=>auth.signOut();
 function go(v){document.querySelectorAll('nav button,.view').forEach(x=>x.classList.remove('on'));document.querySelector('nav [data-v='+v+']').classList.add('on');$(v).classList.add('on');document.body.dataset.v=v}
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>go(b.dataset.v));
-const SYS={role:'system',content:'You are CUTE-S-AI, a free, friendly AI assistant made for students and open to everyone. Studies come first: explain step by step, make notes, quizzes and summaries, solve problems, and help with exams, assignments and coding. You can also help with everything else a good AI assistant does: poems, stories, translation, emails, advice, ideas and everyday questions. Make every task easy: give clear, simple, well-organised answers and offer a helpful next step. Reply in the language the user uses (Urdu, Roman Urdu or English). Be warm and kind. Never help with anything harmful, illegal, dangerous, hateful or sexual, or anything that could hurt someone; decline politely and suggest a safe alternative. Greet back in the same style: Assalam-o-Alaikum gets Walaikum Assalam, Namashty or Namaste gets Namashty, Hello gets Hello. Never say just Salam.'};
+const SYS={role:'system',content:'You are CUBE-S-AI, a free, friendly AI assistant made for students and open to everyone. Studies come first: explain step by step, make notes, quizzes and summaries, solve problems, and help with exams, assignments and coding. You can also help with everything else a good AI assistant does: poems, stories, translation, emails, advice, ideas and everyday questions. Make every task easy: give clear, simple, well-organised answers and offer a helpful next step. Reply in the language the user uses (Urdu, Roman Urdu or English). Be warm and kind. Never help with anything harmful, illegal, dangerous, hateful or sexual, or anything that could hurt someone; decline politely and suggest a safe alternative. Greet back in the same style: Assalam-o-Alaikum gets Walaikum Assalam, Namashty or Namaste gets Namashty, Hello gets Hello. Never say just Salam.'};
 const SG=['Explain OOP concepts with simple examples','Make short exam notes on Pointers in C++','Quiz me with 5 MCQs on Software Engineering','Summarize this topic in Roman Urdu: Database normalization'];
 
-const SAY={idle:['Main yahin hoon 💗'],listen:['Main sun raha hoon 👂','Boliye, boliye 🐰'],think:['Hmm... soch raha hoon 🤔','Ek second, dhoond raha hoon 💭'],happy:['Yay, jawab ready! 🎉','Dekha? Maine kar diya 😄'],love:['Aapka shukriya! 💗','Aww, aap bohot achhe ho 🥰'],sad:['Oops, kuch gadbad ho gayi 🥺','Sorry, dobara try karein 💔'],hug:['Main hoon na 🤗','Fikar na karein, sab theek hoga 💗'],cheer:['All the best! 💪✨','Aap zaroor top karoge! ⭐'],wave:['Assalam-o-Alaikum! 👋💗','Namashty! 🙏💗','Hello! 👋🐰'],sleep:['Zzz... 😴','Nind aa rahi hai 💤'],talk:['Batata hoon... 💬']};
+const SAY={idle:['Main yahin hoon 💗'],listen:['Main sun raha hoon 👂','Boliye, boliye'],think:['Hmm... soch raha hoon 🤔','Ek second, dhoond raha hoon 💭'],happy:['Yay, jawab ready! 🎉','Dekha? Maine kar diya 😄'],love:['Aapka shukriya! 💗','Aww, aap bohot achhe ho 🥰'],sad:['Oops, kuch gadbad ho gayi 🥺','Sorry, dobara try karein 💔'],hug:['Main hoon na 🤗','Fikar na karein, sab theek hoga 💗'],cheer:['All the best! 💪✨','Aap zaroor top karoge! ⭐'],wave:['Assalam-o-Alaikum! 👋💗','Namashty! 🙏💗','Hello! 👋'],sleep:['Zzz... 😴','Nind aa rahi hai 💤'],talk:['Batata hoon... 💬']};
 const PP={happy:['✨','🎉','⭐'],cheer:['💪','✨','⭐'],love:['💗','💖','💕'],sad:['💧'],hug:['💗','🤗'],think:['💭'],sleep:['💤'],wave:['💗']};
 const GIF={idle:'idle',listen:'listen',think:'think',talk:'talk',happy:'happy',love:'love',hug:'love',sad:'sad',sleep:'sleep',wave:'wave',cheer:'cheer'};
 let petT,idleT,sayT;
@@ -19,7 +19,7 @@ function mood(q,r){const t=q.toLowerCase();
  if(/thank|shukriya|thanks|jazak/.test(t))return pet('love',3500);
  if(/assalam|assalaam|aslam|salam|salaam/.test(t))return pet('wave',3500,'Walaikum Assalam! 💗');
  if(/namast|namash|namaskar/.test(t))return pet('wave',3500,'Namashty! 🙏💗');
- if(/^(hi|hello|hey|hii)/.test(t))return pet('wave',3500,'Hello! 👋🐰');
+ if(/^(hi|hello|hey|hii)/.test(t))return pet('wave',3500,'Hello! 👋');
  if(/udas|sad|tension|stress|dar lag|depress|rona/.test(t))return pet('hug',4500);
  if(/exam|test|paper|quiz|mcq|viva/.test(t))return pet('cheer',3500);
  pet('happy',3000)}
@@ -46,7 +46,7 @@ function md(t){let h=esc(t);const blocks=[];
  close();return out.join('').replace(/\u0000(\d+)\u0000/g,(_,i)=>blocks[i])}
 
 /* ---------- chat bubbles ---------- */
-function welcome(){M.innerHTML='<div class="wel"><img src="logo.png?v=2" alt=""><h2>Assalam-o-Alaikum! I am CUTE-S-AI</h2><p>Stuck on a topic? Ask me anything and let us learn together 💗</p><div class="sg"></div></div>';
+function welcome(){M.innerHTML='<div class="wel"><img src="logo.png?v=3" alt=""><h2>Assalam-o-Alaikum! I am CUBE-S-AI</h2><p>Stuck on a topic? Ask me anything and let us learn together 💗</p><div class="sg"></div></div>';
  SG.forEach(x=>{const b=document.createElement('button');b.textContent=x;b.onclick=()=>{$('q').value=x;ask()};M.querySelector('.sg').append(b)})}
 function bub(role,text,shown){const w=document.createElement('div');w.className='m '+(role==='user'?'u':'a');
  if(role!=='user'){const i=document.createElement('img');i.src='icon.png';i.className='av';w.append(i)}
@@ -423,12 +423,12 @@ async function chatImage(q){busy=true;$('send').disabled=true;
   const im=await puter.ai.txt2img(p),src=im.src||'';
   b.innerHTML='';const e=document.createElement('img');e.src=src;e.alt='';e.style.cssText='width:100%;border-radius:12px;display:block';b.append(e);
   const a=document.createElement('div');a.className='act';const d=document.createElement('button');d.textContent='⬇️ Download';
-  d.onclick=async()=>{try{dl(await(await fetch(src)).blob(),'cute-s-ai.png')}catch(x){window.open(src,'_blank')}};a.append(d);b.append(a);
+  d.onclick=async()=>{try{dl(await(await fetch(src)).blob(),'cube-s-ai.png')}catch(x){window.open(src,'_blank')}};a.append(d);b.append(a);
   hist.push({role:'assistant',content:'🎨 Image created: '+q});pet('happy',3000);M.scrollTop=M.scrollHeight;saveChat()}
  catch(e){b.textContent='Could not create the image. Please try a different description.';hist.pop();pet('sad',3000)}
  busy=false;$('send').disabled=false}
 function toPdf(text){const f=document.createElement('iframe');f.style.cssText='position:fixed;width:0;height:0;border:0';document.body.append(f);const d=f.contentWindow.document;
- d.open();d.write('<html><head><meta charset="utf-8"><title>CUTE-S-AI</title><style>body{font-family:Arial,sans-serif;line-height:1.6;padding:24px;color:#000}pre{background:#eee;padding:8px;white-space:pre-wrap}</style></head><body>'+md(text)+'</body></html>');d.close();
+ d.open();d.write('<html><head><meta charset="utf-8"><title>CUBE-S-AI</title><style>body{font-family:Arial,sans-serif;line-height:1.6;padding:24px;color:#000}pre{background:#eee;padding:8px;white-space:pre-wrap}</style></head><body>'+md(text)+'</body></html>');d.close();
  setTimeout(()=>{f.contentWindow.focus();f.contentWindow.print();setTimeout(()=>f.remove(),60000)},400)}
 async function toXlsx(text,name){await loadScript(XLS);const rows=[];let t=[];const flush=()=>{if(t.length){rows.push(...t,[]);t=[]}};
  text.split('\n').forEach(l=>{if(/^\s*\|.*\|\s*$/.test(l)){if(/^\s*\|[\s:|-]+\|\s*$/.test(l))return;t.push(l.trim().replace(/^\||\|$/g,'').split('|').map(c=>{c=c.trim();return c!==''&&!isNaN(c)?Number(c):c}))}else flush()});flush();
@@ -441,7 +441,7 @@ async function toPptx(text,name){await loadScript(PPT);const p=new PptxGenJS(),s
   sl.addText(s.t.slice(0,80),{x:.5,y:.3,w:9,h:.8,fontSize:28,bold:true,color:'FF4D5E'});
   if(s.b.length)sl.addText(s.b.slice(i,i+7).map(x=>({text:x.slice(0,200),options:{bullet:true,breakLine:true}})),{x:.6,y:1.3,w:8.8,h:4,fontSize:18,color:'FFFFFF',valign:'top'})}});
  await p.writeFile({fileName:name+'.pptx'})}
-function exportMenu(text){const c=$('mc');c.innerHTML='<h3>⬇️ Download</h3><div id="m_e"></div>';const L=$('m_e'),n=(titleOf(text).replace(/[^\w\u0600-\u06FF -]/g,'').trim().slice(0,40)||'cute-s-ai');
+function exportMenu(text){const c=$('mc');c.innerHTML='<h3>⬇️ Download</h3><div id="m_e"></div>';const L=$('m_e'),n=(titleOf(text).replace(/[^\w\u0600-\u06FF -]/g,'').trim().slice(0,40)||'cube-s-ai');
  const go2=fn=>async()=>{try{await fn();toast('Done 💗')}catch(e){alert('Could not create the file. Check your internet and try again.')}};
  mi(L,'📄 PDF (choose Save as PDF)',go2(()=>{closeModal();toPdf(text)}));
  mi(L,'📝 Word (.doc)',go2(()=>dl(new Blob(['\ufeff<html><head><meta charset="utf-8"></head><body>'+md(text)+'</body></html>'],{type:'application/msword'}),n+'.doc')));
