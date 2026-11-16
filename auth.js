@@ -1,9 +1,13 @@
+/**
+ * CUBE-S-AI | AI Study Assistant
+ * auth.js - Authentication (email and phone)
+ */
 const $=i=>document.getElementById(i);let mode='email',signup=false,conf=null,rv=null;
 const say=(t,ok)=>{$('msg').textContent=t;$('msg').className='msg'+(ok?' ok':'')};
 auth.onAuthStateChanged(u=>{if(u&&(u.emailVerified||u.phoneNumber))location.href='app.html'});
-function ui(){$('h').textContent=signup?'Create account':'Welcome back';$('s').textContent=signup?'Join CUBE-S AI and learn together':'Login to continue your studies';
- $('go').textContent=mode==='mobile'?($('ob').hidden?'Send code':'Verify & continue'):(signup?'Sign up':'Login');
- $('tw').hidden=!signup&&mode==='email';if(mode==='mobile')$('tw').hidden=false;$('fgr').hidden=signup;$('swt').textContent=signup?'Already have an account?':'New here?';$('sw').textContent=signup?'Login':'Create account';
+function ui(){$('h').textContent=signup?'Begin your journey':'Welcome back';$('s').textContent=signup?'Every expert was once a beginner. Your story starts here.':'Your goals are waiting for you. Let us keep moving forward.';
+ $('go').textContent=mode==='mobile'?($('ob').hidden?'Send code':'Verify & continue'):(signup?'Get Started':'Continue Learning');
+ $('tw').hidden=!signup&&mode==='email';if(mode==='mobile')$('tw').hidden=false;$('fgr').hidden=signup;$('swt').textContent=signup?'Already have an account?':'New here?';$('sw').textContent=signup?'Log in':'Create account';
  $('pe').hidden=mode!=='email';$('pm').hidden=mode!=='mobile';$('tabs').dataset.m=mode;document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.m===mode));say('')}
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{mode=t.dataset.m;ui()});
 $('sw').onclick=()=>{signup=!signup;ui()};

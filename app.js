@@ -1,3 +1,7 @@
+/**
+ * CUBE-S-AI | AI Study Assistant
+ * app.js - Chat, notes, quiz and study tools
+ */
 const $=i=>document.getElementById(i);let user;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 auth.onAuthStateChanged(u=>{if(!u||!(u.emailVerified||u.phoneNumber))return location.href='index.html';user=u;$('who').textContent=u.email||u.phoneNumber;init();load()});
@@ -46,7 +50,7 @@ function md(t){let h=esc(t);const blocks=[];
  close();return out.join('').replace(/\u0000(\d+)\u0000/g,(_,i)=>blocks[i])}
 
 /* ---------- chat bubbles ---------- */
-function welcome(){M.innerHTML='<div class="wel"><img src="logo.png?v=5" alt=""><h2>Assalam-o-Alaikum! I am CUBE-S-AI</h2><p>Stuck on a topic? Ask me anything and let us learn together 💗</p><div class="sg"></div></div>';
+function welcome(){M.innerHTML='<div class="wel"><img src="logo.png?v=5" alt=""><h2>Assalam-o-Alaikum! I am CUBE-S-AI</h2><p>You are capable of more than you know. Ask me anything, and we will learn together 💗</p><div class="sg"></div></div>';
  SG.forEach(x=>{const b=document.createElement('button');b.textContent=x;b.onclick=()=>{$('q').value=x;ask()};M.querySelector('.sg').append(b)})}
 function bub(role,text,shown){const w=document.createElement('div');w.className='m '+(role==='user'?'u':'a');
  if(role!=='user'){const i=document.createElement('img');i.src='icon.png';i.className='av';w.append(i)}

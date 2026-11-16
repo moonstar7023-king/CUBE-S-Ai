@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#070707">
-<title>CUBE-S AI</title><link rel="icon" href="icon.png?v=4"><link rel="manifest" href="manifest.json">
+<title>CUBE-S-AI | AI Study Assistant</title><meta name="description" content="CUBE-S-AI: an AI study assistant with step-by-step answers, quizzes, flashcards and a shared notes library for students."><meta name="theme-color" content="#070707"><meta property="og:title" content="CUBE-S-AI | AI Study Assistant"><meta property="og:description" content="AI tutor and shared notes library for students."><meta property="og:image" content="logo.png"><link rel="icon" href="icon.png?v=4"><link rel="manifest" href="manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--red:#e5162d;--hi:#ff4258;--lo:#c40f25;--rose:#ffd6df;--mute:#c9a9b2;--line:rgba(255,255,255,.1);--err:#ff8095;--serif:'Cormorant Garamond',Georgia,serif}
@@ -13,7 +13,7 @@ button,input{font:inherit;color:inherit}button{cursor:pointer}[hidden]{display:n
 .hero{width:min(62vw,240px);-webkit-mask-image:radial-gradient(closest-side,#000 72%,transparent);mask-image:radial-gradient(closest-side,#000 72%,transparent);animation:fl 4s ease-in-out infinite}.hero img{width:100%;display:block}
 @keyframes fl{50%{transform:translateY(-6px)}}
 .brand{font-family:var(--serif);font-weight:600;font-size:44px;letter-spacing:3px;color:var(--rose);text-shadow:0 0 22px rgba(255,120,150,.35);margin-top:-8px}.brand b{color:var(--hi)}
-.tag{font-family:var(--serif);font-style:italic;color:var(--mute);margin-top:10px}
+.tag{font-family:var(--serif);font-style:italic;font-size:17px;line-height:1.45;text-align:center;max-width:330px;color:#d9c9ce;margin-top:10px}.tag2{font-size:13px;font-weight:600;letter-spacing:.4px;text-align:center;color:var(--hi);margin-top:6px}
 .chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px}.chips span{font-size:11px;padding:5px 10px;border:1px solid var(--line);border-radius:99px;color:var(--rose);background:rgba(255,255,255,.04)}
 .card{width:100%;margin-top:20px;padding:24px 20px 20px;background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:22px;backdrop-filter:blur(16px);box-shadow:0 24px 60px rgba(0,0,0,.55)}
 h2{font-family:var(--serif);font-size:28px;text-align:center;color:var(--rose)}.sub{font-size:13px;text-align:center;color:#b9a8ad;margin:4px 0 18px}
@@ -31,9 +31,9 @@ label.f{display:block;font-size:12px;color:var(--rose);margin:0 0 7px}.w{display
 </style><script>window.onerror=function(m,s,l){var d=document.getElementById("msg");if(d){d.textContent="Error: "+m+" ("+String(s||"").split("/").pop()+":"+l+")"}};</script></head><body>
 <div class="page">
 <div class="hero"><img src="logo.png?v=5" alt="CUBE-S AI logo"></div>
-<div class="tag">Your study buddy, always here</div>
-<div class="chips"><span>🤖 AI Tutor</span><span>📚 Shared Notes</span><span>💗 Made for Students</span></div>
-<div class="card"><h2 id="h">Welcome back</h2><p class="sub" id="s">Login to continue your studies</p>
+<div class="tag">Believe in yourself. We will walk with you, every step of the way. 💗</div><div class="tag2">Learn. Grow. Achieve. Today is your day! 🚀</div>
+<div class="chips"><span>🚀 Learn Faster</span><span>💡 Think Deeper</span><span>🤝 Never Alone</span></div>
+<div class="card"><h2 id="h">Welcome back</h2><p class="sub" id="s">Your goals are waiting for you. Let us keep moving forward.</p>
 <div class="tabs" id="tabs" data-m="email"><div class="pill"></div><button class="tab on" data-m="email">✉️ Email</button><button class="tab" data-m="mobile">📱 Mobile</button></div>
 <div id="pe"><label class="f">Email</label><div class="w"><input id="em" type="email" placeholder="you@example.com" autocomplete="email"></div>
 <label class="f">Password</label><div class="w"><input id="pw" type="password" placeholder="Min 8 characters" autocomplete="current-password"><button class="eye" id="eye" type="button" aria-label="Show password">👁</button></div>
@@ -41,9 +41,9 @@ label.f{display:block;font-size:12px;color:var(--rose);margin:0 0 7px}.w{display
 <div id="pm" hidden><label class="f">Mobile number</label><div class="w"><span class="pre">+92</span><input id="ph" type="tel" inputmode="numeric" placeholder="3XX XXXXXXX" maxlength="11" autocomplete="tel-national"></div>
 <div id="ob" hidden><label class="f">6-digit code</label><div class="w"><input id="otp" inputmode="numeric" maxlength="6" placeholder="••••••" autocomplete="one-time-code" style="letter-spacing:8px;text-align:center"></div></div></div>
 <label class="ck" id="tw" hidden><input type="checkbox" id="tm"><span>I agree to the <a class="lk" href="privacy.html" style="padding:0">Privacy Policy & Terms</a></span></label>
-<p class="msg" id="msg" role="alert"></p><button class="btn" id="go">Login</button>
+<p class="msg" id="msg" role="alert"></p><button class="btn" id="go">Continue Learning</button>
 <p class="sw"><span id="swt">New here?</span> <button class="lk" id="sw" type="button">Create account</button></p><div id="rc"></div></div>
-<p class="foot">🔒 Secure login · <a href="privacy.html">Privacy</a> · Made by iTz×͜Shahmir</p></div>
+<p class="foot">🔒 Your data is safe with us · <a href="privacy.html">Privacy</a> · Made with 💗 by iTz×͜Shahmir</p></div>
 <script>
 function ld(a){return new Promise(function(ok,no){var i=0;(function n(){if(i>=a.length)return no();var s=document.createElement("script");s.src=a[i++];s.onload=ok;s.onerror=n;document.head.appendChild(s)})()})}
 function say0(t){var d=document.getElementById("msg");if(d)d.textContent=t}
@@ -51,7 +51,7 @@ function say0(t){var d=document.getElementById("msg");if(d)d.textContent=t}
  var G="https://www.gstatic.com/firebasejs/10.12.2/firebase-",J="https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-";
  for(var f of ["app","auth","firestore"])await ld([G+f+"-compat.js",J+f+"-compat.js"]);
  try{await ld([G+"storage-compat.js",J+"storage-compat.js"])}catch(e){}
- await ld(["firebase-config.js?v=3"]);await ld(["auth.js?v=4"]);
+ await ld(["firebase-config.js?v=5"]);await ld(["auth.js?v=10"]);
 }catch(e){say0("Could not load the app. Check your internet, VPN or Private DNS, then refresh.")}})();
 </script><script>setInterval(()=>{const e=document.createElement('div');e.className='h';e.textContent='♥';e.style.left=Math.random()*100+'vw';e.style.fontSize=10+Math.random()*16+'px';e.style.animationDuration=7+Math.random()*6+'s';document.body.append(e);setTimeout(()=>e.remove(),14000)},1400)</script>
 <script>if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js"))</script></body></html>
