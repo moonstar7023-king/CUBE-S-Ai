@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#070707">
-<title>CUBE-S-AI</title><link rel="icon" href="icon.png?v=3"><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icon.png?v=3">
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="app.css?v=18"></head><body>
+<title>CUBE-S-AI</title><link rel="icon" href="icon.png?v=4"><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icon.png?v=4">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="app.css?v=100"></head><body>
 <header><button class="ib" id="hb" title="Chats" aria-label="Chats"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16M4 16h10"/></svg></button><div class="ttl">CUBE-S-<b>AI</b></div><button class="ib" id="nc" title="New chat" aria-label="New chat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-6"/><path d="M18.4 3.6a1.9 1.9 0 0 1 2.7 2.7L12 15.4l-3.8 1 1-3.8z"/></svg></button><button class="ib" id="st" title="Settings" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg></button></header>
 <main>
 <section id="chat" class="view on"><div id="msgs"></div><div class="ap" id="ap" hidden></div>
@@ -21,6 +21,6 @@ function say0(t){var d=document.getElementById("msg");if(d)d.textContent=t}
  var G="https://www.gstatic.com/firebasejs/10.12.2/firebase-",J="https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-";
  for(var f of ["app","auth","firestore"])await ld([G+f+"-compat.js",J+f+"-compat.js"]);
  try{await ld([G+"storage-compat.js",J+"storage-compat.js"])}catch(e){}
- await ld(["firebase-config.js?v=3"]);await ld(["app.js?v=20"]);
+ await ld(["firebase-config.js?v=3"]);await ld(["app.js?v=22"]);
 }catch(e){say0("Could not load the app. Check your internet, VPN or Private DNS, then refresh.")}})();
 </script></body></html>

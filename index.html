@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#070707">
-<title>CUBE-S AI</title><link rel="icon" href="icon.png"><link rel="manifest" href="manifest.json">
+<title>CUBE-S AI</title><link rel="icon" href="icon.png?v=4"><link rel="manifest" href="manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--red:#e5162d;--hi:#ff4258;--lo:#c40f25;--rose:#ffd6df;--mute:#c9a9b2;--line:rgba(255,255,255,.1);--err:#ff8095;--serif:'Cormorant Garamond',Georgia,serif}
@@ -10,10 +10,10 @@ background:radial-gradient(60% 40% at 50% 0,rgba(229,22,45,.18),transparent 70%)
 button,input{font:inherit;color:inherit}button{cursor:pointer}[hidden]{display:none!important}
 .h{position:fixed;bottom:-30px;color:var(--hi);opacity:.25;pointer-events:none;animation:up linear forwards}@keyframes up{to{transform:translateY(-115vh) rotate(25deg);opacity:0}}
 .page{position:relative;z-index:1;max-width:440px;margin:auto;min-height:100dvh;padding:max(18px,env(safe-area-inset-top)) 22px max(26px,env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;justify-content:center}
-.hero{width:190px;-webkit-mask-image:radial-gradient(closest-side,#000 72%,transparent);mask-image:radial-gradient(closest-side,#000 72%,transparent);animation:fl 4s ease-in-out infinite}.hero img{width:100%;display:block}
+.hero{width:min(88vw,360px);border-radius:28px;overflow:hidden;animation:fl 4s ease-in-out infinite}.hero img{width:100%;display:block}
 @keyframes fl{50%{transform:translateY(-6px)}}
 .brand{font-family:var(--serif);font-weight:600;font-size:44px;letter-spacing:3px;color:var(--rose);text-shadow:0 0 22px rgba(255,120,150,.35);margin-top:-8px}.brand b{color:var(--hi)}
-.tag{font-family:var(--serif);font-style:italic;color:var(--mute);margin-top:4px}
+.tag{font-family:var(--serif);font-style:italic;color:var(--mute);margin-top:10px}
 .chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px}.chips span{font-size:11px;padding:5px 10px;border:1px solid var(--line);border-radius:99px;color:var(--rose);background:rgba(255,255,255,.04)}
 .card{width:100%;margin-top:20px;padding:24px 20px 20px;background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:22px;backdrop-filter:blur(16px);box-shadow:0 24px 60px rgba(0,0,0,.55)}
 h2{font-family:var(--serif);font-size:28px;text-align:center;color:var(--rose)}.sub{font-size:13px;text-align:center;color:#b9a8ad;margin:4px 0 18px}
@@ -30,8 +30,8 @@ label.f{display:block;font-size:12px;color:var(--rose);margin:0 0 7px}.w{display
 .sw{text-align:center;margin-top:14px;font-size:13px;color:#b9a8ad}.foot{margin-top:16px;font-size:11px;color:#75676b;text-align:center}.foot a{color:var(--mute)}
 </style><script>window.onerror=function(m,s,l){var d=document.getElementById("msg");if(d){d.textContent="Error: "+m+" ("+String(s||"").split("/").pop()+":"+l+")"}};</script></head><body>
 <div class="page">
-<div class="hero"><img src="logo.png" alt="CUBE-S AI logo"></div>
-<div class="brand">CUBE-S <b>AI</b></div><div class="tag">Your study buddy, always here</div>
+<div class="hero"><img src="logo.png?v=5" alt="CUBE-S AI logo"></div>
+<div class="tag">Your study buddy, always here</div>
 <div class="chips"><span>🤖 AI Tutor</span><span>📚 Shared Notes</span><span>💗 Made for Students</span></div>
 <div class="card"><h2 id="h">Welcome back</h2><p class="sub" id="s">Login to continue your studies</p>
 <div class="tabs" id="tabs" data-m="email"><div class="pill"></div><button class="tab on" data-m="email">✉️ Email</button><button class="tab" data-m="mobile">📱 Mobile</button></div>

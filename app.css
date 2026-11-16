@@ -37,7 +37,7 @@ main{flex:1;min-height:0;position:relative}
 
 /* ----- welcome ----- */
 .wel{text-align:center;padding:7vh 4px 8px}
-.wel img{width:72px;-webkit-mask-image:radial-gradient(closest-side,#000 72%,transparent);mask-image:radial-gradient(closest-side,#000 72%,transparent)}
+.wel img{width:min(80vw,300px);border-radius:24px}
 .wel h2{font-family:var(--serif);font-size:30px;font-weight:500;line-height:1.2;color:var(--rose);margin:14px 0 8px}
 .wel p{color:var(--mute);font-size:15px;line-height:1.5}
 .sg{display:flex;flex-direction:column;margin-top:30px;text-align:left}
