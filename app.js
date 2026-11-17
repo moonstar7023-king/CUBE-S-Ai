@@ -58,9 +58,6 @@ function bub(role,text,shown){const w=document.createElement('div');w.className=
  if(role!=='user'){const i=document.createElement('img');i.src='icon.png';i.className='av';w.append(i)}
  const b=document.createElement('div');b.className='b';if(role==='user')b.textContent=shown||text;else b.innerHTML=text?md(text):'<div class="ldw"><img class="ld" src="loading.gif" alt=""><span>Please wait...</span></div>';
  w.append(b);
- const rb=document.createElement('button');rb.className='rpb';rb.textContent='↩';rb.title='Reply';rb.setAttribute('aria-label','Reply to this message');
- rb.onclick=()=>{const c=b.cloneNode(true);c.querySelectorAll('.act,.ldw').forEach(e=>e.remove());const t=c.textContent.trim();if(t)setReply(role,t)};
- if(role==='user')w.prepend(rb);else w.append(rb);
  M.append(w);M.scrollTop=M.scrollHeight;return b}
 function setReply(role,text){rep={who:role==='user'?'You':'CUBE-S-AI',text:String(text).replace(/\s+/g,' ').trim().slice(0,300)};showReply();$('q').focus()}
 function showReply(){let r=$('rp');if(!r){r=document.createElement('div');r.id='rp';r.className='ap';$('ap').before(r)}
@@ -74,17 +71,49 @@ function lastTurn(b,fn){if(busy)return toast('Please wait for the answer to fini
  if(!w||w!==M.lastElementChild||!p||!p.classList.contains('u'))return toast('Only the latest answer can be changed.');fn(w,p)}
 function regen(w,p){const u=hist[hist.length-2];if(!u||u.role!=='user')return;hist.splice(-2);w.remove();p.remove();run(u.content,u.shown)}
 function edit(w,p){const u=hist[hist.length-2];if(!u||u.role!=='user')return;hist.splice(-2);w.remove();p.remove();$('q').value=u.shown||u.content;$('q').focus();$('q').style.height='auto';$('q').style.height=Math.min($('q').scrollHeight,120)+'px'}
-function acts(b,text){const a=document.createElement('div');a.className='act';
- const mk=(t,fn)=>{const x=document.createElement('button');x.textContent=t;x.onclick=()=>fn(x);a.append(x)};
- mk('📋 Copy',x=>{navigator.clipboard?.writeText(text);x.textContent='✅ Copied'});
- mk('🔄 Regenerate',()=>lastTurn(b,regen));mk('✏️ Edit',()=>lastTurn(b,edit));
- mk('🔊 Listen',x=>speak(text,x));
- mk('📝 Notes',()=>gen('summary',text));mk('❓ Quiz',()=>gen('quiz',text));mk('🃏 Cards',()=>gen('cards',text));
- mk('📚 Save',x=>saveLib({type:'note',title:titleOf(text),content:text},x));
- if(/```html/i.test(text))mk('▶ Preview',()=>preview(text));
- mk('⬇️ Export',()=>exportMenu(text));
- mk('📤 Share',()=>{$('t').value=lastQ();$('tx').value=text.slice(0,20000);go('up')});
+const ICO={copy:'<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/>',share:'<path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/>',play:'<path d="M8 5v14l11-7z"/>',stop:'<rect x="6" y="6" width="12" height="12" rx="2"/>',up:'<path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/>',down:'<path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z"/>',redo:'<path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/>',more:'<circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/>',check:'<path d="M5 12l5 5 9-10"/>'};
+const IC=n=>'<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICO[n]+'</svg>';
+const spk=(b,on)=>{if(b)b.innerHTML=IC(on?'stop':'play')};
+function acts(b,text){const a=document.createElement('div');a.className='act ai';
+ const mk=(n,label,fn)=>{const x=document.createElement('button');x.className='ib2';x.innerHTML=IC(n);x.title=label;x.setAttribute('aria-label',label);x.onclick=()=>fn(x);a.append(x);return x};
+ mk('copy','Copy',x=>{try{navigator.clipboard.writeText(text)}catch(e){}x.innerHTML=IC('check');setTimeout(()=>{x.innerHTML=IC('copy')},1500)});
+ mk('share','Share',()=>shareText(text));
+ mk('play','Read aloud',x=>speak(text,x));
+ const up=mk('up','Good answer',()=>rate('up',b,text,up,dn)),dn=mk('down','Bad answer',()=>rate('down',b,text,up,dn));
+ mk('redo','Regenerate',()=>lastTurn(b,regen));
+ mk('more','More',()=>moreMenu(b,text));
  b.append(a)}
+async function shareText(t){if(navigator.share){try{await navigator.share({title:'CUBE-S-AI',text:t.slice(0,3000)});return}catch(e){if(e&&e.name==='AbortError')return}}
+ try{await navigator.clipboard.writeText(t);toast('Copied. Paste it anywhere to share.')}catch(e){toast('Could not share.')}}
+async function rate(kind,b,text,up,dn){
+ let ok=false;try{ok=!!localStorage.getItem('cs_fb_ok')}catch(e){}
+ if(!ok){if(!confirm('Feedback helps us improve CUBE-S-AI. It sends your rating, this question and this answer to the CUBE-S-AI team. Send feedback?'))return;try{localStorage.setItem('cs_fb_ok','1')}catch(e){}}
+ let reason='';if(kind==='down'){const r=prompt('What went wrong? (optional)','');if(r===null)return;reason=r.trim().slice(0,300)}
+ const w=b.parentElement,p=w&&w.previousElementSibling;let q='';if(p&&p.classList.contains('u')){const c=p.querySelector('.b');q=c?c.textContent:''}
+ try{await db.collection('feedback').add({uid:user.uid,rating:kind,reason,question:q.slice(0,400),answer:text.slice(0,2000),createdAt:TS()});
+  up.disabled=dn.disabled=true;const x=kind==='up'?up:dn;x.style.color='var(--cl)';x.style.opacity='1';toast('Thanks for your feedback 💗')}
+ catch(e){toast('Could not send feedback. Please try again later.')}}
+function moreMenu(b,text){const m=$('mc');m.innerHTML='<h3>More</h3><div id="m_o"></div>';const L=$('m_o');const g=f=>()=>{closeModal();f()};
+ mi(L,'✏️ Edit my last message',g(()=>lastTurn(b,edit)));
+ mi(L,'📝 Make notes',g(()=>gen('summary',text)));mi(L,'❓ Quiz me',g(()=>gen('quiz',text)));mi(L,'🃏 Flashcards',g(()=>gen('cards',text)));
+ mi(L,'📚 Save to my library',g(()=>saveLib({type:'note',title:titleOf(text),content:text})));
+ if(/```html/i.test(text))mi(L,'▶ Preview',g(()=>preview(text)));
+ mi(L,'⬇️ Export',g(()=>exportMenu(text)));
+ mi(L,'🌐 Share with community notes',g(()=>{$('t').value=lastQ();$('tx').value=text.slice(0,20000);go('up')}));
+ openModal()}
+/* ---------- select text to reply ---------- */
+const rpop=document.createElement('button');rpop.id='rpop';rpop.type='button';rpop.hidden=true;rpop.textContent='↩ Reply';document.body.append(rpop);
+let selTxt='',selRole='assistant',selT=null;
+function checkSel(){const s=window.getSelection();if(!s||s.isCollapsed||!s.rangeCount){rpop.hidden=true;return}
+ const t=s.toString().replace(/\s+/g,' ').trim();const n=s.anchorNode&&(s.anchorNode.nodeType===1?s.anchorNode:s.anchorNode.parentElement);const w=n&&n.closest&&n.closest('.m');
+ if(!t||!w||!M.contains(w)){rpop.hidden=true;return}
+ selTxt=t;selRole=w.classList.contains('u')?'user':'assistant';
+ const r=s.getRangeAt(0).getBoundingClientRect();rpop.hidden=false;
+ rpop.style.left=Math.min(Math.max(r.left+r.width/2-45,8),innerWidth-110)+'px';
+ rpop.style.top=(r.bottom+44>innerHeight?Math.max(r.top-52,8):r.bottom+40)+'px'}
+document.addEventListener('selectionchange',()=>{clearTimeout(selT);selT=setTimeout(checkSel,200)});
+rpop.addEventListener('pointerdown',e=>e.preventDefault());
+rpop.onclick=()=>{setReply(selRole,selTxt);rpop.hidden=true;try{getSelection().removeAllRanges()}catch(e){}};
 
 /* ---------- AI helpers (Puter.js) ---------- */
 async function puterReady(){
@@ -261,10 +290,10 @@ $('mic').onclick=()=>{if(!SR)return alert('Voice input is not supported in this 
  rec.onend=()=>{rec=null;$('mic').classList.remove('on')};rec.onerror=()=>{};
  $('mic').classList.add('on');try{rec.start()}catch(e){rec=null;$('mic').classList.remove('on')}};
 function speak(text,btn){if(!window.speechSynthesis)return alert('Voice output is not supported here.');
- if(speechSynthesis.speaking){speechSynthesis.cancel();if(btn)btn.textContent='🔊 Listen';return}
+ if(speechSynthesis.speaking){speechSynthesis.cancel();spk(btn,false);return}
  const clean=text.replace(/```[\s\S]*?```/g,' code block ').replace(/[*#`_>|-]/g,' ').replace(/\s+/g,' ').slice(0,3500);
- const u=new SpeechSynthesisUtterance(clean);u.lang=VL[profile.vlang]||'en-US';u.onend=()=>{if(btn)btn.textContent='🔊 Listen'};
- if(btn)btn.textContent='⏹ Stop';speechSynthesis.speak(u)}
+ const u=new SpeechSynthesisUtterance(clean);u.lang=VL[profile.vlang]||'en-US';u.onend=()=>spk(btn,false);
+ spk(btn,true);speechSynthesis.speak(u)}
 
 /* ---------- study tools: notes, quiz, flashcards ---------- */
 function parseJ(s,kind){const m=s.match(/\[[\s\S]*\]/);if(!m)return null;let a;try{a=JSON.parse(m[0])}catch(e){return null}

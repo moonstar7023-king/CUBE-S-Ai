@@ -184,4 +184,9 @@ button.mrow:active{background:var(--surface)}
 .ghost{padding:8px 14px;margin:0 6px 0 0;border:1px solid var(--line);border-radius:99px;font-size:13px;color:var(--rose)}
 .ghost:active{background:var(--surface)}
 
-.rpb{flex:none;align-self:center;background:none;border:0;color:var(--mute);font-size:16px;opacity:.55;padding:6px 8px}.rpb:active{opacity:1;color:var(--cl)}
+
+.act.ai{gap:2px;align-items:center}
+.ib2{flex:none;display:grid;place-items:center;width:40px;height:38px;padding:0!important;border-radius:10px}
+.ib2 svg{display:block}.ib2:disabled{opacity:.5}
+#rpop{position:fixed;z-index:70;display:block;padding:9px 16px;border-radius:99px;background:#1b1416;border:1px solid var(--line);color:var(--text);font-size:13.5px;box-shadow:0 6px 20px rgba(0,0,0,.5)}
+#rpop[hidden]{display:none}

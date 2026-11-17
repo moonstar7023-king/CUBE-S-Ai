@@ -46,6 +46,19 @@ service cloud.firestore{
    allow read, update, delete: if false;
   }
 
+  // Feedback (like / dislike): users can only create; only the owner reads it in the Firebase Console
+  match /feedback/{id}{
+   allow create: if ok()
+    && request.resource.data.keys().hasOnly(['uid','rating','reason','question','answer','createdAt'])
+    && request.resource.data.uid==request.auth.uid
+    && request.resource.data.rating in ['up','down']
+    && str(request.resource.data.reason,0,300)
+    && str(request.resource.data.question,0,400)
+    && str(request.resource.data.answer,0,2000)
+    && request.resource.data.createdAt==request.time;
+   allow read, update, delete: if false;
+  }
+
   // Private data of each student (chats, projects, saved items, profile)
   match /users/{uid}/{document=**}{
    allow read, write: if ok() && request.auth.uid==uid;
