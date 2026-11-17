@@ -125,14 +125,14 @@ async function puterReady(){
 const LOWBAL=/credit|balance|funding|insufficient|upgrade|payment|quota|limit/i;let noPuter=false;
 async function freeAI(msgs,onTxt){
  /* free fallback (no login, no credits) used when the Puter account has no balance */
- let last='';
- for(const model of ['openai','openai-fast','mistral']){
-  try{const r=await fetch('https://text.pollinations.ai/openai',{method:'POST',headers:{'Content-Type':'application/json'},
-   body:JSON.stringify({model,messages:msgs.map(m=>({role:m.role,content:String(m.content)}))})});
-   if(!r.ok){last='HTTP '+r.status;continue}
-   const j=await r.json();const t=(j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content)||'';
-   if(t){if(onTxt)onTxt(t);return t}last='empty reply'}
-  catch(e){last=(e&&e.message)||String(e)}}
+ let last='';const body=m=>JSON.stringify({model:m,messages:msgs.map(x=>({role:x.role,content:String(x.content)}))});
+ for(const url of ['https://gen.pollinations.ai/v1/chat/completions','https://text.pollinations.ai/openai']){
+  for(const model of ['openai','openai-fast','mistral']){
+   try{const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:body(model)});
+    if(!r.ok){last=url.split('/')[2]+' HTTP '+r.status;if(r.status===404||r.status===401||r.status===403)break;continue}
+    const j=await r.json();const t=(j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content)||'';
+    if(t){if(onTxt)onTxt(t);return t}last='empty reply'}
+   catch(e){last=(e&&e.message)||String(e)}}}
  throw new Error('Free AI failed: '+last)}
 async function aiCall(msgs,onTxt){let full='',err='';
  if(!noPuter){
