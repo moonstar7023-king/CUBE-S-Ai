@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#070707">
-<title>CUBE-S-AI | AI Study Assistant</title><meta name="description" content="CUBE-S-AI: an AI study assistant with step-by-step answers, quizzes, flashcards and a shared notes library for students."><meta name="theme-color" content="#070707"><meta property="og:title" content="CUBE-S-AI | AI Study Assistant"><meta property="og:description" content="AI tutor and shared notes library for students."><meta property="og:image" content="logo.png"><link rel="icon" href="icon.png?v=4"><link rel="manifest" href="manifest.json">
+<title>CUBE-S-AI | AI Study Assistant</title><meta name="description" content="CUBE-S-AI: an AI assistant with step-by-step answers, quizzes, flashcards and a shared notes library for everyone."><meta name="theme-color" content="#070707"><meta property="og:title" content="CUBE-S-AI | AI Study Assistant"><meta property="og:description" content="AI assistant and shared notes library for everyone."><meta property="og:image" content="logo.png"><link rel="icon" href="icon.png?v=4"><link rel="manifest" href="manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--red:#e5162d;--hi:#ff4258;--lo:#c40f25;--rose:#ffd6df;--mute:#c9a9b2;--line:rgba(255,255,255,.1);--err:#ff8095;--serif:'Cormorant Garamond',Georgia,serif}
@@ -16,7 +16,7 @@ button,input{font:inherit;color:inherit}button{cursor:pointer}[hidden]{display:n
 .tag{font-family:var(--serif);font-style:italic;font-size:17px;line-height:1.45;text-align:center;max-width:330px;color:#d9c9ce;margin-top:10px}.tag2{font-size:13px;font-weight:600;letter-spacing:.4px;text-align:center;color:var(--hi);margin-top:6px}
 .chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px}.chips span{font-size:11px;padding:5px 10px;border:1px solid var(--line);border-radius:99px;color:var(--rose);background:rgba(255,255,255,.04)}
 .card{width:100%;margin-top:20px;padding:24px 20px 20px;background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:22px;backdrop-filter:blur(16px);box-shadow:0 24px 60px rgba(0,0,0,.55)}
-h2{font-family:var(--serif);font-size:28px;text-align:center;color:var(--rose)}.sub{font-size:13px;text-align:center;color:#b9a8ad;margin:4px 0 18px}
+h2{font-family:var(--serif);font-size:26px;text-align:center;color:var(--rose);text-transform:uppercase;letter-spacing:1.5px}.sub{font-size:13px;text-align:center;color:#b9a8ad;margin:4px 0 18px}
 .tabs{position:relative;display:grid;grid-template-columns:1fr 1fr;padding:4px;margin-bottom:18px;border-radius:13px;background:rgba(0,0,0,.45);border:1px solid var(--line)}
 .pill{position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);border-radius:10px;background:linear-gradient(180deg,var(--hi),var(--lo));transition:transform .3s}.tabs[data-m=mobile] .pill{transform:translateX(100%)}
 .tab{position:relative;z-index:1;padding:11px;background:none;border:0;font-size:13px;color:#b9a8ad}.tab.on{color:#fff;font-weight:600}
@@ -51,7 +51,7 @@ function say0(t){var d=document.getElementById("msg");if(d)d.textContent=t}
  var G="https://www.gstatic.com/firebasejs/10.12.2/firebase-",J="https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-";
  for(var f of ["app","auth","firestore"])await ld([G+f+"-compat.js",J+f+"-compat.js"]);
  try{await ld([G+"storage-compat.js",J+"storage-compat.js"])}catch(e){}
- await ld(["firebase-config.js?v=5"]);await ld(["auth.js?v=10"]);
+ await ld(["firebase-config.js?v=5"]);await ld(["auth.js?v=11"]);
 }catch(e){say0("Could not load the app. Check your internet, VPN or Private DNS, then refresh.")}})();
 </script><script>setInterval(()=>{const e=document.createElement('div');e.className='h';e.textContent='♥';e.style.left=Math.random()*100+'vw';e.style.fontSize=10+Math.random()*16+'px';e.style.animationDuration=7+Math.random()*6+'s';document.body.append(e);setTimeout(()=>e.remove(),14000)},1400)</script>
 <script>if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js"))</script></body></html>

@@ -4,7 +4,7 @@
 
 # CUBE-S-AI
 
-**Your AI study partner. Always ready, always patient, always on your side.**
+**Your AI partner for learning, work and everyday life. Built for everyone.**
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Open%20App-e5162d?style=for-the-badge)](https://moonstar7023-king.github.io/CUBE-S-Ai/)
 [![PWA](https://img.shields.io/badge/PWA-Installable-111111?style=for-the-badge)](#features)
@@ -16,7 +16,7 @@
 
 ## About
 
-CUBE-S-AI is a free AI study assistant and shared notes library built for students. Ask a question in your own words and get a clear, step-by-step explanation. Turn any PDF, image or text file into short notes, a quiz or flashcards. Share what you learn with others.
+CUBE-S-AI is a free AI assistant and shared notes library built for everyone: students, professionals, creators and anyone who needs a clear solution. Ask a question in your own words and get a clear, step-by-step answer. Turn any PDF, image or text file into short notes, a quiz or flashcards. Share what you know with others.
 
 It is a lightweight static web app (HTML, CSS and vanilla JavaScript) with no build step, so it is fast, simple to host and easy to understand.
 
@@ -29,7 +29,7 @@ It is a lightweight static web app (HTML, CSS and vanilla JavaScript) with no bu
 | 💬 | **AI tutor chat** | Streaming answers with step-by-step explanations, examples and code help |
 | 📎 | **Attach and learn** | Upload a PDF, image, text, CSV or Excel file and turn it into notes, a quiz or flashcards |
 | 🎙️ | **Voice in and out** | Speak your question and listen to the answer (browser support required) |
-| 📚 | **Shared notes library** | Upload, browse and share study notes with other students |
+| 📚 | **Shared notes library** | Upload, browse and share notes and knowledge with others |
 | 🕘 | **Chat history** | Pick up where you left off |
 | 🔐 | **Secure login** | Email and phone sign-in with Firebase Authentication |
 | 📱 | **Installable PWA** | Add to your home screen and use it like a native app, with offline caching |
