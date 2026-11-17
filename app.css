@@ -1,3 +1,7 @@
+/**
+ * CUBE-S-AI | AI Study Assistant
+ * app.css - App styles
+ */
 /* CUBE-S-AI v15: Claude-style look. Bottom nav keeps its original look. */
 :root{
  --i-folder:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'/%3E%3C/svg%3E");
@@ -179,3 +183,5 @@ button.mrow:active{background:var(--surface)}
 .pavr h3{font-family:'DM Sans',system-ui,sans-serif;font-size:15px;font-weight:500;color:var(--text);word-break:break-all;margin:0 0 8px}
 .ghost{padding:8px 14px;margin:0 6px 0 0;border:1px solid var(--line);border-radius:99px;font-size:13px;color:var(--rose)}
 .ghost:active{background:var(--surface)}
+
+.rpb{flex:none;align-self:center;background:none;border:0;color:var(--mute);font-size:16px;opacity:.55;padding:6px 8px}.rpb:active{opacity:1;color:var(--cl)}
