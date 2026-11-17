@@ -28,6 +28,7 @@ function mood(q,r){const t=q.toLowerCase();
  if(/udas|sad|tension|stress|dar lag|depress|rona/.test(t))return pet('hug',4500);
  if(/exam|test|paper|quiz|mcq|viva/.test(t))return pet('cheer',3500);
  pet('happy',3000)}
+let dq='',temp=false,mems=[],rep=null;
 let hist=[],busy=false,cid=null,cproj='',projects=[],chats=[],profile={},deep='normal',attach=null,inited=false,fproj='';
 const M=$('msgs'),UD=()=>db.collection('users').doc(user.uid),TS=()=>firebase.firestore.FieldValue.serverTimestamp();
 const VL={en:'en-US',ur:'ur-PK',hi:'hi-IN',ar:'ar-SA',pa:'pa-IN',fa:'fa-IR',bn:'bn-BD',tr:'tr-TR',es:'es-ES',fr:'fr-FR',de:'de-DE',ru:'ru-RU',zh:'zh-CN',ja:'ja-JP',ko:'ko-KR',id:'id-ID'};
@@ -56,7 +57,17 @@ function welcome(){M.innerHTML='<div class="wel"><img src="logo.png?v=5" alt="">
 function bub(role,text,shown){const w=document.createElement('div');w.className='m '+(role==='user'?'u':'a');
  if(role!=='user'){const i=document.createElement('img');i.src='icon.png';i.className='av';w.append(i)}
  const b=document.createElement('div');b.className='b';if(role==='user')b.textContent=shown||text;else b.innerHTML=text?md(text):'<div class="ldw"><img class="ld" src="loading.gif" alt=""><span>Please wait...</span></div>';
- w.append(b);M.append(w);M.scrollTop=M.scrollHeight;return b}
+ w.append(b);
+ const rb=document.createElement('button');rb.className='rpb';rb.textContent='↩';rb.title='Reply';rb.setAttribute('aria-label','Reply to this message');
+ rb.onclick=()=>{const c=b.cloneNode(true);c.querySelectorAll('.act,.ldw').forEach(e=>e.remove());const t=c.textContent.trim();if(t)setReply(role,t)};
+ if(role==='user')w.prepend(rb);else w.append(rb);
+ M.append(w);M.scrollTop=M.scrollHeight;return b}
+function setReply(role,text){rep={who:role==='user'?'You':'CUBE-S-AI',text:String(text).replace(/\s+/g,' ').trim().slice(0,300)};showReply();$('q').focus()}
+function showReply(){let r=$('rp');if(!r){r=document.createElement('div');r.id='rp';r.className='ap';$('ap').before(r)}
+ if(!rep){r.hidden=true;r.innerHTML='';return}
+ r.hidden=false;r.style.cssText='border-left:3px solid var(--cl);margin:0 16px;padding:4px 10px;justify-content:space-between;flex-wrap:nowrap';r.innerHTML='';
+ const t=document.createElement('span');t.style.cssText='overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0';t.textContent='↩ Replying to '+rep.who+': '+rep.text;
+ const x=document.createElement('button');x.textContent='✕';x.setAttribute('aria-label','Cancel reply');x.style.cssText='background:none;border:0;color:var(--mute);font-size:15px;flex:none';x.onclick=()=>{rep=null;showReply()};r.append(t,x)}
 const lastQ=()=>{const u=hist.filter(h=>h.role==='user').pop();return ((u&&(u.shown||u.content))||'Notes').split('\n')[0].slice(0,100)};
 const titleOf=t=>String(t).replace(/[#*`_>-]/g,'').trim().split('\n')[0].slice(0,60)||'Untitled';
 function lastTurn(b,fn){if(busy)return toast('Please wait for the answer to finish.');const w=b.parentElement,p=w&&w.previousElementSibling;
@@ -93,15 +104,19 @@ function sysMsg(){let c=SYS.content;const p=profile;
  if(pr)c+='\nCurrent project: "'+pr.name+'". Student notes about it: '+(pr.ctx||'none')+'. Keep answers relevant to this project.';
  if(deep==='advance')c+='\nAdvance mode: think carefully, give a well-structured answer with clear explanations and one short example.';if(deep==='deep')c+='\nDeep mode is ON: reason step by step, double-check calculations and facts, then give a clear final answer.';
  c+='\nResponse length: '+({auto:'match the question, short for simple ones and detailed for hard ones.',short:'keep answers short and to the point.',detailed:'give detailed, thorough answers.'}[SET.len||'auto'])+' Tone: '+({friendly:'friendly and warm.',formal:'formal and polite.',pro:'professional and precise.',beginner:'very beginner-friendly, using the simplest words and small steps.',expert:'expert level, technical and concise.'}[SET.tone||'friendly'])+' Follow these preferences unless they conflict with safety rules.';
+ if(SET.mem!==false&&mems.length)c+='\nThings the user asked you to remember (use only when relevant): '+mems.slice(0,30).map(x=>x.text).join('; ')+'.';
+ if(SET.ci)c+='\nUser custom instructions (follow unless they conflict with safety rules): '+String(SET.ci).slice(0,600);
  if(SET.lang!=='auto')c+='\nAlways reply in '+LN[SET.lang]+', whatever language the student writes in.';else c+='\nYou understand every language in the world. Reply in the language the student writes in.';
  c+='\nWhen a chart helps, add a fenced block named chart with JSON like {"type":"bar","title":"T","labels":["A","B"],"values":[1,2]} (type bar, line or pie). For diagrams use a mermaid block. For a small web page or app give one complete html block. For spreadsheet data, calculate carefully and show your working.';
  return {role:'system',content:c+extra}}
 
 /* ---------- send a message ---------- */
 async function ask(){const q=$('q').value.trim();if((!q&&!attach)||busy)return;
+ const rm=!attach&&!temp&&SET.mem!==false&&q.match(/^\s*(?:please\s+)?(?:remember|yaad\s*rakh(?:o|na)?)\s+(?:that\s+)?(.{3,200})$/i);if(rm)await addMem(rm[1]);
  if(!attach&&isImg(q)){$('q').value='';$('q').style.height='auto';return chatImage(q)}
  let content=q,shown=q;
  if(attach){content=(q||'Summarize this file for me.')+'\n\n[Attached file: '+attach.name+']\n'+attach.text;shown=(q||'Summarize this file')+'\n📎 '+attach.name;clearAttach()}
+ if(rep){const qt=rep.text;content='[The user is replying to this earlier message from '+rep.who+': "'+qt+'"]\n'+content;shown='↩ '+rep.who+': '+qt.slice(0,80)+(qt.length>80?'…':'')+'\n'+shown;rep=null;showReply()}
  $('q').value='';$('q').style.height='auto';await run(content,shown)}
 async function run(content,shown){busy=true;$('send').disabled=true;
  if(!await puterReady()){busy=false;$('send').disabled=false;return}
@@ -122,16 +137,16 @@ $('q').oninput=e=>{e.target.style.height='auto';e.target.style.height=Math.min(e
 $('q').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey&&innerWidth>700){e.preventDefault();ask()}};
 
 /* ---------- chat history (private, per user) ---------- */
-async function saveChat(){if(!hist.length)return;
+async function saveChat(){if(!hist.length||temp)return;
  if(!cid)cid=UD().collection('chats').doc().id;
  const msgs=hist.slice(-40).map((h,i,a)=>({role:h.role,content:h.content.slice(0,i<a.length-4?3000:14000),shown:(h.shown||'').slice(0,500)}));
  const first=hist.find(h=>h.role==='user');const m0=chats.find(c=>c.id===cid)||{};const title=m0.renamed?m0.title:((first&&(first.shown||first.content))||'Chat').split('\n')[0].slice(0,60);
  try{const ref=UD().collection('chats').doc(cid),b=db.batch();
   b.set(ref,{title,project:cproj,updatedAt:TS()},{merge:true});b.set(ref.collection('msgs').doc('main'),{messages:msgs});await b.commit()}catch(e){toast('Could not save this chat.')}}
 async function loadChats(){try{const s=await UD().collection('chats').orderBy('updatedAt','desc').limit(60).get();chats=s.docs.map(d=>({id:d.id,...d.data()}))}catch(e){chats=[]}}
-function newChat(){if(busy)return;hist=[];cid=null;clearAttach();welcome();chip();go('chat')}
+function newChat(){if(busy)return;temp=false;rep=null;showReply();hist=[];cid=null;clearAttach();welcome();chip();go('chat')}
 $('nc').onclick=newChat;
-async function openChat(id){if(busy)return;M.innerHTML='<div class="ldw" style="padding:14px"><span>Please wait...</span></div>';go('chat');
+async function openChat(id){if(busy)return;temp=false;M.innerHTML='<div class="ldw" style="padding:14px"><span>Please wait...</span></div>';go('chat');
  try{const d=await UD().collection('chats').doc(id).collection('msgs').doc('main').get();const meta=chats.find(c=>c.id===id)||{};
   hist=((d.data()||{}).messages||[]).map(m=>({role:m.role,content:m.content,shown:m.shown||''}));cid=id;cproj=meta.project||'';chip();
   M.innerHTML='';if(!hist.length)return welcome();
@@ -143,24 +158,51 @@ function closeDrawer(){$('dr').hidden=true}
 async function openDrawer(){$('dr').hidden=false;$('dl').textContent='Please wait...';await loadChats();renderDrawer()}
 function renderDrawer(){const J=$('dj');J.innerHTML='';
  const chipB=(t,v)=>{const b=document.createElement('button');b.className='chip'+(fproj===v?' on':'');b.textContent=t;b.onclick=()=>{fproj=v;renderDrawer()};J.append(b)};
- chipB('All','');projects.forEach(p=>chipB('📁 '+p.name,p.id));
- const L=$('dl');L.innerHTML='';const list=chats.filter(c=>!fproj||c.project===fproj).sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0));
- if(!list.length){L.textContent='No chats here yet. Start one 💗';return}
+ chipB('All','');projects.forEach(p=>chipB('📁 '+p.name,p.id));chipB('🗄 Archived','__arch');
+ if(!$('dtop')){const T=document.createElement('div');T.id='dtop';T.style.cssText='padding:4px 2px 8px';
+  const tb=document.createElement('button');tb.className='mi';tb.textContent='🕶 Temporary chat (not saved)';
+  tb.onclick=()=>{if(busy)return toast('Please wait for the answer to finish.');newChat();temp=true;chip();closeDrawer();toast('Temporary chat: it will not be saved')};
+  const si=document.createElement('input');si.id='ds';si.placeholder='🔎 Search chats';si.style.cssText='width:100%;margin-top:6px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--text);font-size:14px';
+  si.oninput=()=>{dq=si.value.trim().toLowerCase();renderList()};T.append(tb,si);J.after(T)}
+ renderList()}
+function renderList(){const L=$('dl');L.innerHTML='';const arch=fproj==='__arch';
+ let list=chats.filter(c=>arch?c.archived:(!c.archived&&(!fproj||c.project===fproj)));
+ if(dq)list=list.filter(c=>(c.title||'').toLowerCase().includes(dq));
+ list.sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0));
+ if(!list.length){L.textContent=arch?'No archived chats.':dq?'No chats match your search.':'No chats here yet. Start one 💗';return}
  list.forEach(c=>{const r=document.createElement('div');r.className='ci'+(c.id===cid?' on':'');
   const pn=(projects.find(p=>p.id===c.project)||{}).name;const dt=c.updatedAt&&c.updatedAt.toDate?c.updatedAt.toDate().toLocaleDateString():'';
   r.innerHTML='<div><b>'+(c.pinned?'📌 ':'')+esc(c.title)+'</b><small>'+(pn?'📁 '+esc(pn)+' · ':'')+esc(dt)+'</small></div>';
   r.firstChild.onclick=()=>{closeDrawer();openChat(c.id)};
-  const d=document.createElement('button');d.className='d';d.textContent='🗑';d.onclick=async e=>{e.stopPropagation();if(!confirm('Delete this chat?'))return;await delChat(c.id);renderDrawer()};
-  const pn2=document.createElement('button');pn2.className='d';pn2.textContent=c.pinned?'📍':'📌';pn2.title=c.pinned?'Unpin':'Pin';
-  pn2.onclick=async e=>{e.stopPropagation();try{await UD().collection('chats').doc(c.id).set({pinned:!c.pinned},{merge:true});c.pinned=!c.pinned;renderDrawer()}catch(x){toast('Could not update.')}};
-  const rn=document.createElement('button');rn.className='d';rn.textContent='✏️';rn.title='Rename';
-  rn.onclick=async e=>{e.stopPropagation();const t=prompt('Rename chat',c.title);if(!t||!t.trim())return;try{await UD().collection('chats').doc(c.id).set({title:t.trim().slice(0,60),renamed:true},{merge:true});c.title=t.trim().slice(0,60);c.renamed=true;renderDrawer()}catch(x){toast('Could not rename.')}};
-  r.append(pn2,rn,d);L.append(r)})}
+  const m=document.createElement('button');m.className='d';m.textContent='⋯';m.title='More';m.style.fontSize='20px';m.onclick=e=>{e.stopPropagation();chatMenu(c)};
+  r.append(m);L.append(r)})}
+function chatMenu(c){const m=$('mc');m.innerHTML='<h3></h3><div id="m_c"></div>';m.firstChild.textContent=c.title;const L=$('m_c');
+ const set=async(o,msg)=>{try{await UD().collection('chats').doc(c.id).set(o,{merge:true});Object.assign(c,o);closeModal();renderDrawer();if(msg)toast(msg)}catch(x){toast('Could not update.')}};
+ mi(L,c.pinned?'📍 Unpin':'📌 Pin to top',()=>set({pinned:!c.pinned}));
+ mi(L,'✏️ Rename',()=>{const t=prompt('Rename chat',c.title);if(t&&t.trim())set({title:t.trim().slice(0,60),renamed:true})});
+ mi(L,c.archived?'📤 Restore from archive':'🗄 Archive',()=>set({archived:!c.archived},c.archived?'Restored':'Archived'));
+ mi(L,'⬇️ Download chat (.txt)',()=>dlChat(c));
+ mi(L,'🗑 Delete',async()=>{if(!confirm('Delete this chat?'))return;closeModal();await delChat(c.id);renderDrawer()},'ac');
+ openModal()}
+async function dlChat(c){try{const d=await UD().collection('chats').doc(c.id).collection('msgs').doc('main').get();const ms=(d.exists&&d.data().messages)||[];
+ const t=ms.map(x=>(x.role==='user'?'You: ':'CUBE-S-AI: ')+(x.role==='user'?(x.shown||x.content):x.content)).join('\n\n');
+ dl(new Blob([c.title+'\n\n'+t],{type:'text/plain'}),(c.title||'chat').replace(/[^\w\- ]+/g,'').slice(0,40)+'.txt');closeModal()}catch(e){toast('Could not download.')}}
+/* ---------- memory (user-controlled) ---------- */
+async function loadMems(){try{const s=await UD().collection('memory').orderBy('createdAt','desc').limit(40).get();mems=s.docs.map(d=>({id:d.id,...d.data()}))}catch(e){mems=[]}}
+async function addMem(t){t=String(t).trim().slice(0,200);if(!t)return;try{const r=await UD().collection('memory').add({text:t,createdAt:TS()});mems.unshift({id:r.id,text:t});toast('Saved to memory 🧠')}catch(e){toast('Could not save memory.')}}
+function memMenu(){const m=$('mc');m.innerHTML='<h3>🧠 Memory</h3><div id="m_m"></div>';const L=$('m_m');
+ const note=document.createElement('p');note.style.cssText='color:var(--mute);font-size:13px;margin:0 0 8px';note.textContent='Only what you ask me to remember is saved. Say "Remember that ..." in a chat to add. You can delete anything at any time.';L.append(note);
+ mi(L,(SET.mem===false?'⬜':'✅')+' Use memory in chats',()=>{SET.mem=SET.mem===false;saveSet();memMenu()});
+ mi(L,'➕ Add a memory',async()=>{const t=prompt('What should I remember?');if(t){await addMem(t);memMenu()}});
+ if(!mems.length){const e=document.createElement('p');e.style.cssText=note.style.cssText;e.textContent='Nothing saved yet.';L.append(e)}
+ mems.forEach(x=>{const b=document.createElement('button');b.className='mi';b.textContent='🗑 '+x.text;b.onclick=async()=>{try{await UD().collection('memory').doc(x.id).delete();mems=mems.filter(y=>y.id!==x.id);memMenu()}catch(e){toast('Could not delete.')}};L.append(b)});
+ if(mems.length)mi(L,'🧹 Clear all memory',async()=>{if(!confirm('Delete all saved memory?'))return;for(const x of mems){try{await UD().collection('memory').doc(x.id).delete()}catch(e){}}mems=[];memMenu()},'ac');
+ openModal()}
 $('hb').onclick=openDrawer;$('dx').onclick=closeDrawer;$('dbg').onclick=closeDrawer;
 
 /* ---------- projects ---------- */
 async function loadProjects(){try{const s=await UD().collection('projects').orderBy('createdAt').get();projects=s.docs.map(d=>({id:d.id,...d.data()}))}catch(e){projects=[]}}
-function chip(){const p=projects.find(x=>x.id===cproj);$('pj').textContent=p?p.name:'New project'}
+function chip(){const p=projects.find(x=>x.id===cproj);$('pj').textContent=temp?'🕶 Temporary chat':(p?p.name:'New project')}
 function setProj(id){cproj=id;chip();if(hist.length)saveChat()}
 async function newProj(){const n=(prompt('Project name (for example: Software Engineering)')||'').trim().slice(0,40);if(!n)return;
  const ctx=(prompt('What should I know about it? (exam date, topics, teacher style). Optional.')||'').trim().slice(0,400);
@@ -306,6 +348,7 @@ $('dav').onclick=()=>{closeDrawer();document.querySelector('nav [data-v=me]').cl
 /* ---------- start ---------- */
 async function init(){if(inited)return;inited=true;welcome();
  try{const p=await UD().get();profile=p.exists?p.data():{}}catch(e){profile={}}
+ loadMems();
  fillProfile();try{const v=localStorage.getItem('cs_deep');deep=['normal','advance','deep'].includes(v)?v:(v==='1'?'deep':'normal')}catch(e){}chipDeep();
  await loadProjects();chip();
  try{const old=JSON.parse(localStorage.getItem('cs_'+user.uid)||'[]');
@@ -415,6 +458,8 @@ function settings(){const c=$('mc');c.innerHTML='<h3>⚙️ Settings</h3><div id
  mi(L,'🔤 Text size: '+({s:'Small',m:'Medium',l:'Large'})[SET.fs],()=>{SET.fs={s:'m',m:'l',l:'s'}[SET.fs];saveSet();applySet();settings()});
  mi(L,'🌐 Reply language: '+langName(SET.lang),langMenu);
  mi(L,'📏 Answer length: '+({auto:'Auto',short:'Short',detailed:'Detailed'}[SET.len||'auto']),()=>{SET.len={auto:'short',short:'detailed',detailed:'auto'}[SET.len||'auto'];saveSet();settings()});
+ mi(L,'🧠 Memory ('+mems.length+' saved)',memMenu);
+ mi(L,'📝 Custom instructions'+(SET.ci?' ✅':''),()=>{const t=prompt('How should CUBE-S-AI respond to you? Leave empty to clear.',SET.ci||'');if(t===null)return;SET.ci=t.trim().slice(0,600);saveSet();settings()});
  mi(L,'🎭 Tone: '+({friendly:'Friendly',formal:'Formal',pro:'Professional',beginner:'Beginner',expert:'Expert'}[SET.tone||'friendly']),()=>{SET.tone={friendly:'formal',formal:'pro',pro:'beginner',beginner:'expert',expert:'friendly'}[SET.tone||'friendly'];saveSet();settings()});
  mi(L,'🧠 Mode: '+({normal:'Normal',advance:'Advance',deep:'Deep'}[deep]),()=>{setDeep(deep==='normal'?'advance':deep==='advance'?'deep':'normal');settings()});
  mi(L,'🗑 Delete all my chats',async()=>{if(confirm('Delete ALL chats? This cannot be undone.')){await wipe('chats');closeModal()}},'ac');
