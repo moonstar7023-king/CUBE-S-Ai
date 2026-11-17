@@ -122,11 +122,25 @@ async function puterReady(){
  if(typeof puter==='undefined'){alert('The AI could not load. Check your internet or VPN, then refresh the page.');return false}
  try{if(!puter.auth.isSignedIn())await puter.auth.signIn()}catch(e){alert('Please sign in to Puter to use the AI. Allow popups and try again.');return false}
  return true}
-async function aiCall(msgs,onTxt){let full='',err='';
- for(const mdl of ['claude-sonnet-4-5','claude-sonnet-4','gpt-4o-mini']){
+const LOWBAL=/credit|balance|funding|insufficient|upgrade|payment|quota|limit/i;
+async function freeAI(msgs,onTxt){
+ /* free fallback (no login, no credits) used when the Puter account has no balance */
+ const r=await fetch('https://text.pollinations.ai/openai',{method:'POST',headers:{'Content-Type':'application/json'},
+  body:JSON.stringify({model:'openai',messages:msgs.map(m=>({role:m.role,content:String(m.content)}))})});
+ if(!r.ok)throw new Error('Free AI error '+r.status);
+ const j=await r.json();const t=(j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content)||'';
+ if(!t)throw new Error('Free AI returned nothing');if(onTxt)onTxt(t);return t}
+async function aiCall(msgs,onTxt){let full='',err='',noCredit=false;
+ /* cheapest models first so the Puter free allowance lasts much longer */
+ for(const mdl of ['gpt-4o-mini','gpt-5-nano','gemini-2.0-flash','claude-3-5-haiku-latest']){
   try{const r=await puter.ai.chat(msgs,{model:mdl,stream:true});
    for await(const p of r){full+=p?.text||'';if(onTxt)onTxt(full)}
-   if(full)break}catch(e){err=(e&&(e.message||e.error?.message||JSON.stringify(e)))||String(e);if(full)break}}
+   if(full)break}
+  catch(e){err=(e&&(e.message||e.error?.message||JSON.stringify(e)))||String(e);if(full)break;
+   if(LOWBAL.test(err)){noCredit=true;break}}}
+ if(!full){
+  try{full=await freeAI(msgs,onTxt);err=''}
+  catch(e2){err=noCredit?'Your Puter account has no credits left. Wait for the free allowance to reset, or add credits at puter.com.':(err||String(e2&&e2.message||e2))}}
  return {full,err}}
 function sysMsg(){let c=SYS.content;const p=profile;
  const pf=[p.cls&&'level/class: '+p.cls,p.subj&&'subjects: '+p.subj,p.goal&&'goals: '+p.goal].filter(Boolean);
