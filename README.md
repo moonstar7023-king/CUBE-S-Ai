@@ -30,6 +30,8 @@ It is a lightweight static web app (HTML, CSS and vanilla JavaScript) with no bu
 | 📎 | **Attach and learn** | Upload a PDF, image, text, CSV or Excel file and turn it into notes, a quiz or flashcards |
 | 🎙️ | **Voice in and out** | Speak your question and listen to the answer (browser support required) |
 | 📚 | **Shared notes library** | Upload, browse and share notes and knowledge with others |
+| 🔑 | **Bring your own AI key (optional)** | Connect your own OpenAI, Anthropic Claude or Google Gemini key. Keys are encrypted on your device (AES-GCM), never uploaded. Free Puter AI stays the default. |
+| ☁️ | **CUBE-S-AI Cloud (optional)** | Shared AI models through a Cloudflare Worker with Firebase login checks, daily allowance, monthly budget cap and alerts. Ships OFF. See `docs/DEPLOY-PHASE2.md`. |
 | 🕘 | **Chat history** | Pick up where you left off |
 | 🔐 | **Secure login** | Email and phone sign-in with Firebase Authentication |
 | 📱 | **Installable PWA** | Add to your home screen and use it like a native app, with offline caching |
@@ -54,6 +56,12 @@ CUBE-S-AI/
 ├── app.js              Chat, AI helpers, notes, quiz and flashcards
 ├── auth.js             Authentication logic
 ├── app.css / style.css Styles
+├── ai/                 Provider layer: vault.js (encrypted keys), providers.js (OpenAI, Claude, Gemini),
+│                       router.js (selection, consent, no silent fallback), ui.js, ai.css
+├── tests/              Unit tests (`node --test tests/*.test.js`), browser tests (`python3 tests/e2e_phase1.py`, `python3 tests/e2e_phase2.py`); Worker tests: `cd worker && node --test test/worker.test.js`
+├── worker/             Cloudflare Worker (CUBE-S-AI Cloud): src/, test/, wrangler.toml (ships OFF)
+├── docs/PHASE2.md      Cloud architecture and safeguards
+├── docs/DEPLOY-PHASE2.md  Step-by-step deployment and operations guide
 ├── firebase-config.js  Firebase web configuration
 ├── firestore.rules     Firestore security rules
 ├── storage.rules       Storage security rules
